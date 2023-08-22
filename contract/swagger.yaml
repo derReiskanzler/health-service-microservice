@@ -1,0 +1,250 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - url: 'http://cl-svc-242.ris.beuth-hochschule.de:5000'
+    description: Production Endpoint
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/health-service/Health-Service_Contract/1.0.0
+info:
+  description: >-
+    This is the health service contract providing endpoints to retrieve info & pass logs for memeit.
+  version: 1.1.3
+  title: Health Service Contract
+  license:
+    name: Apache-2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: health
+    description: log any kind of activity & data
+paths:
+  /v1/health/log:
+    post:
+      tags:
+        - health
+      summary: Log basic activity & relevant data
+      description: Logs <b>requested url</b>, <b>requesting</b> & <b>responsing service</b> name. <br><br> If <b>requesting service</b> wants to log - all data is required, except the <b>status_code</b> field. <br> If <b>responding service</b> wants to log - all data is required.
+      operationId: log
+      requestBody:
+        description: 'Request Body'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogObj'
+      responses:
+        '201':
+          description: Successful Log
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogObj'
+        '400':
+          description: Missing or invalid fields in request body
+          content:
+            application/json:
+              example:
+                statusCode: 400
+                message: 'Missing required fields!'
+        '500':
+          description: Internal server error when creating new log
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: 'Internal server error when creating new log!'
+
+  /v1/health/services:
+    get:
+      tags:
+        - health
+      summary: Retrieve statuses of all services
+      description: Returns <b>statuses of all services</b>, whether they are <b>on- or offline</b>. 
+      operationId: getHealth
+      responses:
+        '200':
+          description: Successful operation - response contains service_statuses object containing objects of ServiceStatusObjects (ServiceStatusObj) accessable by 'service_statuses' key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceStatusResponse'
+
+  /v1/health/logs:
+    get:
+      tags:
+        - health
+      summary: Retrieve summary of logs
+      description: Returns <b>summary of logs</b> of all services consuming <b>POST /v1/health/log endpoint</b>, containing basic <b>meta data</b> of service calls.
+      operationId: getLogs
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Page of response to get
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Limit of response to get
+      responses:
+        '200':
+          description: Successful operation - response contains array of log objects (LogObj) accessable by 'logs' key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLogsResponse'
+        '500':
+          description: Internal server error when accessing /v1/health/logs
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: 'Internal server error when accessing /v1/health/logs!'
+
+  /v1/health/data:
+      get:
+        tags:
+          - health
+        summary: Retrieve measureable data of services
+        description: Returns <b>measureable data of services</b>. `memeCount`, `popularTags` (from storage service), `registeredUsersCount` (from user service), `requestCount` (from frontend service).
+        operationId: getData
+        responses:
+          '200':
+            description: Successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/DataResponse'
+          '500':
+            description: Internal server error when accessing /v1/health/data
+            content:
+              application/json:
+                example:
+                  statusCode: 500
+                  message: 'Internal server error when accessing /v1/health/data!'
+  
+components:
+  schemas:
+
+    ServiceStatusResponse:
+      description: '200 Response of GET /v1/health/service endpoint'
+      type: object
+      required:
+        - service_statuses
+      properties:
+        serviceStatuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceStatusObj'
+      
+    PaginatedLogsResponse:
+      description: '200 Response of GET /v1/health/logs endpoint'
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogObj'
+        page:
+          type: number
+          example: 1
+        limit:
+          type: number
+          example: 10
+        totalCount:
+          type: number
+          example: 31
+        totalPages:
+          type: number
+          example: 4
+        
+            
+    DataResponse:
+      description: '200 Response of GET /v1/health/data endpoint'
+      type: object
+      required:
+        - memeCount
+        - popularTags
+        - registeredUsersCount
+        - requestCount
+      properties:
+        memeCount:
+          type: number
+          example: 323
+        popularTags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        registeredUsersCount:
+          type: number
+          example: 21
+        requestCount:
+          type: number
+          example: 546
+              
+    ServiceStatusObj:
+      description: 'Contains status info to related service - used in ServiceResponse'
+      type: object
+      properties:
+        serviceName:
+          $ref: '#/components/schemas/ServiceName'
+        status: 
+          $ref: '#/components/schemas/ServiceStatus'
+                    
+    ServiceName:
+      description: 'Name of service who can request, response to urls & call endpoints'
+      type: string
+      enum: [INDEX, STORAGE, CRAWLER, CLIENT, FRONTEND, USER, HEALTH]
+        
+    ServiceStatus:
+      type: string
+      enum: [ONLINE, OFFLINE]
+      
+    LogObj:
+      description: 'Defines: <br>- what Requesting services needs to pass for logging (POST endpoint /v1/health/log) or <br>- what services can expect in response when calling (GET endpoint /v1/health/logs)'
+      type: object
+      required:
+        - info
+      properties:
+        info:
+          $ref: '#/components/schemas/Info'
+      
+    Info:
+      description: 'Basic specific info of each service when calling POST endpoint /v1/health/log - used in LogObj'
+      type: object
+      required:
+        - selfServiceName
+        - requestedUrl
+        - timestamp
+      properties:
+        selfServiceName:
+          $ref: '#/components/schemas/ServiceName'
+        otherServiceName:
+          $ref: '#/components/schemas/ServiceName'
+        httpMethod:
+          $ref: '#/components/schemas/HttpMethod'
+        statusCode:
+          type: number
+          example: 200
+        requestedUrl:
+          type: string
+          example: https://frontend-service.api.datexis.com/
+        timestamp:
+          type: string
+          format: date
+          example: '2020-12-21T14:07:32.847Z'
+          
+    HttpMethod:
+        type: string
+        enum: [GET, POST, PUT, PATCH, DELETE]
+      
+    Tag:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'dogs'
+        count:
+          type: number
+          example: 32
+          

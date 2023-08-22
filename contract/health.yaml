@@ -1,0 +1,40 @@
+openapi: 3.0.0
+info:
+  description: services should provide this endpoint so that the health-service is able to request the service's health status
+  version: 1.0.0
+  title: Health status
+  license:
+    name: Apache-2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: Health
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: service health status
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          description: The server has encountered a situation it doesn't know how to handle.
+        '503':
+          description: The server is not ready to handle the request. Common causes are a server that is down for maintenance or that is overloaded.
+components:
+  schemas:
+    HealthResponse:
+      description: '200 Response of GET /health endpoint'
+      type: object
+      required:
+        - health
+      properties:
+        status:
+          type: string
+          enum: ['ONLINE', 'OFFLINE']

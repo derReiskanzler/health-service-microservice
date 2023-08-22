@@ -1,0 +1,42 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "linterOptions": {
+        "exclude": [
+            "node_modules",
+            "src/api/health/**/*.ts"
+        ]
+    },
+    "jsRules": {},
+    "rules": {
+        "indent": [
+            true,
+            "spaces",
+            2
+        ],
+        "max-line-length": [
+            true,
+            140
+        ],
+        "quotemark": [
+            true,
+            "single"
+        ],
+        "trailing-comma": false,
+        "new-parens": true,
+        "no-arg": true,
+        "import-spacing": true,
+        "no-duplicate-imports": true,
+        "no-trailing-whitespace": true,
+        "semicolon": true,
+        "whitespace": true,
+        "no-consecutive-blank-lines": false,
+        "no-console": {
+            "severity": "warning",
+            "options": ["debug", "info", "log", "time", "timeEnd", "trace"]
+        }
+    },
+    "rulesDirectory": []
+}
