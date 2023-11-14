@@ -61,4 +61,8 @@ describe('LogObjController (e2e)', () => {
             expect(typeof(res?.totalPages)).toBe('number');
         });
   });
+
+  afterAll(async () => {
+    await app.close();
+  });
 });

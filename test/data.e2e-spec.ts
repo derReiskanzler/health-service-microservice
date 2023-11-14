@@ -35,4 +35,8 @@ describe('DataController (e2e)', () => {
       expect(typeof(res?.requestCount)).toEqual('number');
     });
   }, 100000);
+
+  afterAll(async () => {
+    await app.close();
+  });
 });
