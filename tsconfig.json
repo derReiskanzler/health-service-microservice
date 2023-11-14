@@ -11,7 +11,11 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false,
+
     /* Strict Type-Checking Options */
     "strict": true,                           /* Enable all strict type-checking options. */
 
