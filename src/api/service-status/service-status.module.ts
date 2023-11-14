@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/common/http/http.module';
 import { ServiceStatusController } from './controller/service-status.controller';
 import { ServiceStatusService } from './service/service-status.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [HttpModule],

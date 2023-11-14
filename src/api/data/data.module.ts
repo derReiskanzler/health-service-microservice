@@ -1,6 +1,7 @@
-import { HttpModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { DataController } from './controller/data.controller';
 import { DataService } from './service/data.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   controllers: [DataController],

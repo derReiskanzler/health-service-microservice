@@ -1,9 +1,11 @@
-import { HttpService, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { catchError, map } from 'rxjs/operators';
 import { FRONTEND_SERVICE_URL, STORAGE_SERVICE_URL, USER_SERVICE_URL, INDEX_SERVICE_URL } from '../../../config/env-vars.config';
 import { ServiceName } from '../../../models/service-name.model';
 import { Status, ServiceStatusObj } from '../../../models/service-status-obj.model';
+import { HttpService } from '@nestjs/axios';
+import { lastValueFrom } from 'rxjs';
 
 const SUFFIX = 'health';
 @Injectable()
@@ -28,14 +30,14 @@ export class ServiceStatusService {
     }
 
     async makeServiceRequest(serviceName: ServiceName, url: string): Promise<ServiceStatusObj> {
-        const res = await this.httpService.get(url)
+        const res = await lastValueFrom(this.httpService.get(url)
             .pipe(
                 map((response: AxiosResponse) => response.status),
                 catchError(err => {
                     this.logger.error(err.message);
                     return err.message;
                 })
-            ).toPromise();
+            ));
         const status = res === 200 ? Status.ONLINE : Status.OFFLINE;
         return {
             serviceName,

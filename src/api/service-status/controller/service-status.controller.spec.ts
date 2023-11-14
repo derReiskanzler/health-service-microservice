@@ -1,7 +1,7 @@
-import { HttpModule } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ServiceStatusService } from '../service/service-status.service';
 import { ServiceStatusController } from './service-status.controller';
+import { HttpModule } from '@nestjs/axios';
 
 describe('ServiceStatusController', () => {
   let controller: ServiceStatusController;

@@ -1,6 +1,6 @@
-import { HttpModule } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataService } from './data.service';
+import { HttpModule } from '@nestjs/axios';
 
 describe('DataService', () => {
   let service: DataService;
